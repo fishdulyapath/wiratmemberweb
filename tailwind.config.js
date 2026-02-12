@@ -30,8 +30,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Prompt', 'Noto Sans Thai', 'sans-serif'],
-        display: ['Kanit', 'sans-serif'],
+        sans: ['"Sarabun"', 'sans-serif'],
+        display: ['"Sarabun"', 'sans-serif'],
       },
     },
   },
