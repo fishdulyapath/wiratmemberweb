@@ -149,7 +149,7 @@
           </button>
         </div>
         <div v-if="processResult" class="mt-3 p-3 rounded-xl bg-emerald-50 text-sm text-emerald-700">
-          คำนวณเสร็จแล้ว: ประมวลผล {{ processResult.processedCount }} เอกสาร
+          {{ processResult.message || 'ส่งคำสั่งคำนวณแล้ว ระบบกำลังทำงานอยู่เบื้องหลัง' }}
         </div>
       </div>
     </template>

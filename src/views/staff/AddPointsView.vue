@@ -23,9 +23,16 @@
       </div>
 
       <!-- Selected customer -->
-      <div v-if="selectedCustomer" class="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-        <p class="text-sm font-medium text-emerald-800">{{ selectedCustomer.name_1 }}</p>
-        <p class="text-xs text-emerald-600">รหัส: {{ selectedCustomer.code }} · แต้มคงเหลือ: {{ formatNumber(selectedCustomer.point_balance) }}</p>
+      <div v-if="selectedCustomer" class="p-4 rounded-xl bg-emerald-50 border border-emerald-100 flex justify-between items-center">
+        <div>
+          <p class="text-sm font-medium text-emerald-800">{{ selectedCustomer.name_1 }}</p>
+          <p class="text-xs text-emerald-600">รหัส: {{ selectedCustomer.code }} · แต้มคงเหลือ: {{ formatNumber(selectedCustomer.point_balance) }}</p>
+        </div>
+        <button @click="clearCustomer" class="p-2 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-colors" title="ยกเลิกการเลือก">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
       <!-- Points input -->
@@ -81,6 +88,11 @@ async function searchCustomer() {
 function selectCustomer(c) {
   selectedCustomer.value = c;
   searchResults.value = [];
+}
+
+function clearCustomer() {
+  selectedCustomer.value = null;
+  searchQuery.value = '';
 }
 
 async function addPoints() {
