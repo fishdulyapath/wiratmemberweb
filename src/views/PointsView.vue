@@ -69,14 +69,11 @@
             </div>
           </div>
 
-          <!-- Point Details -->
-          <div v-if="detail && detail.details" class="mt-2 pt-2 border-t border-navy-100 space-y-1">
-             <div v-for="(d, index) in detail.details.filter(x => x.description && (Number(x.get_point) > 0 || Number(x.return_point) > 0))" :key="index" class="text-xs flex justify-between">
-                <span class="text-navy-500">{{ d.description }}</span>
-                <span :class="(Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? 'text-emerald-600' : 'text-orange-600'">
-                  {{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? '+' : '' }}{{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) }} pt
-                </span>
-             </div>
+          <!-- Point condition descriptions -->
+          <div v-if="detail && detail.details && [...new Set(detail.details.map(d => d.description).filter(Boolean))].length > 0" class="mt-2 pt-2 border-t border-navy-100 space-y-1">
+            <div v-for="(desc, index) in [...new Set(detail.details.map(d => d.description).filter(Boolean))]" :key="index" class="text-xs">
+              <span class="text-navy-500">{{ desc }}</span>
+            </div>
           </div>
         </div>
         <div class="space-y-2">
@@ -89,17 +86,6 @@
               <p class="text-sm font-medium text-navy-800">{{ formatCurrency(d.total_amount || d.sum_amount || 0) }}</p>
             </div>
           </div>
-        </div>
-
-        <!-- Description from details -->
-        <div class="mt-4 p-3 rounded-xl bg-navy-50 text-xs text-navy-600"
-          v-if="detail && detail.details && [...new Set(detail.details.map(d => d.description).filter(d => d && !((Number(d.get_point) > 0 || Number(d.return_point) > 0))))].length > 0">
-           <p class="font-semibold mb-1">รายละเอียดรายรับแต้ม</p>
-           <ul class="list-disc pl-4 space-y-1">
-             <li v-for="(desc, index) in [...new Set(detail.details.map(d => d.description).filter(d => d && !((Number(d.get_point) > 0 || Number(d.return_point) > 0))))]" :key="index">
-               {{ desc }}
-             </li>
-           </ul>
         </div>
 
       </div>
