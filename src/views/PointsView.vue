@@ -53,43 +53,55 @@
     <!-- Detail modal -->
     <ModalSheet :show="!!selectedDoc" :title="selectedDocTitle" subtitle="รายละเอียดแต้ม" :loading="detailLoading" @close="selectedDoc = null">
       <div v-if="detail">
-        <div class="mb-4 p-3 rounded-xl bg-navy-50 space-y-1">
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div><span class="text-navy-400">เลขที่:</span> <span class="text-navy-700 font-medium">{{ detail.header.doc_no }}</span></div>
-            <div><span class="text-navy-400">วันที่:</span> <span class="text-navy-700">{{ formatDate(detail.header.doc_date) }}</span></div>
-            <div v-if="detail.header.doc_no_sale"><span class="text-navy-400">บิลขาย:</span> <span class="text-navy-700">{{ detail.header.doc_no_sale }}</span></div>
-            <div v-if="detail.header.doc_no_return"><span class="text-navy-400">บิลคืน:</span> <span class="text-amber-600">{{ detail.header.doc_no_return }}</span></div>
+        <div class="mb-4 p-3 rounded-xl bg-navy-50 text-xs space-y-1">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-navy-400">เลขที่:</span> <span class="text-navy-700 font-medium">{{ detail.header.doc_no_sale || detail.header.doc_no_return || detail.header.doc_no }}</span>
+            </div>
+            <div>
+              <span class="text-navy-400">วันที่:</span> <span class="text-navy-700">{{ formatDate(detail.header.doc_date) }}</span>
+            </div>
+            <div v-if="Number(detail.header.get_point) > 0">
+              <span class="text-navy-400">แต้มที่ได้:</span> <span class="text-emerald-600 font-medium">+{{ detail.header.get_point }}</span>
+            </div>
+            <div v-if="Number(detail.header.return_point) > 0">
+              <span class="text-navy-400">แต้มที่คืน:</span> <span class="text-orange-600 font-medium">-{{ detail.header.return_point }}</span>
+            </div>
           </div>
-          <div class="flex gap-4 mt-2 pt-2 border-t border-navy-200">
-            <div v-if="Number(detail.header.get_point) !== 0" class="text-xs">
-              <span class="text-navy-400">แต้มที่ได้:</span>
-              <span :class="Number(detail.header.get_point) >= 0 ? 'text-emerald-600' : 'text-red-600'" class="font-semibold ml-1">{{ detail.header.get_point }}</span>
-            </div>
-            <div v-if="Number(detail.header.use_point) !== 0" class="text-xs">
-              <span class="text-navy-400">แต้มที่ใช้:</span>
-              <span class="text-rose-600 font-semibold ml-1">{{ detail.header.use_point }}</span>
-            </div>
+
+          <!-- Point Details -->
+          <div v-if="detail && detail.details" class="mt-2 pt-2 border-t border-navy-100 space-y-1">
+             <div v-for="(d, index) in detail.details.filter(x => x.description && (Number(x.get_point) > 0 || Number(x.return_point) > 0))" :key="index" class="text-xs flex justify-between">
+                <span class="text-navy-500">{{ d.description }}</span>
+                <span :class="(Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? 'text-emerald-600' : 'text-orange-600'">
+                  {{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? '+' : '' }}{{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) }} pt
+                </span>
+             </div>
           </div>
         </div>
-
-        <div v-if="detail.details.length > 0" class="space-y-2">
-          <h4 class="text-xs font-medium text-navy-500 uppercase tracking-wider">รายการสินค้า</h4>
+        <div class="space-y-2">
           <div v-for="(d, i) in detail.details" :key="i" class="flex items-start justify-between py-2 border-b border-navy-50 last:border-0">
             <div class="flex-1 min-w-0">
               <p class="text-sm text-navy-700 truncate">{{ d.item_name }}</p>
               <p class="text-xs text-navy-400">{{ d.item_code }} · {{ d.qty }} {{ d.unit_code }}</p>
             </div>
             <div class="ml-3 text-right">
-              <p v-if="Number(d.sale_amount) > 0" class="text-sm text-navy-700">{{ formatCurrency(d.sale_amount) }}</p>
-              <p v-if="Number(d.return_amount) > 0" class="text-sm text-red-600">-{{ formatCurrency(d.return_amount) }}</p>
-              <p v-if="Number(d.get_point) > 0" class="text-xs text-emerald-600 font-medium">+{{ d.get_point }} pt</p>
+              <p class="text-sm font-medium text-navy-800">{{ formatCurrency(d.total_amount || d.sum_amount || 0) }}</p>
             </div>
           </div>
         </div>
 
-        <div v-if="detail.header.remark" class="mt-4 p-3 rounded-xl bg-brand-50 text-xs text-brand-700">
-          {{ detail.header.remark }}
+        <!-- Description from details -->
+        <div class="mt-4 p-3 rounded-xl bg-navy-50 text-xs text-navy-600"
+          v-if="detail && detail.details && [...new Set(detail.details.map(d => d.description).filter(d => d && !((Number(d.get_point) > 0 || Number(d.return_point) > 0))))].length > 0">
+           <p class="font-semibold mb-1">รายละเอียดรายรับแต้ม</p>
+           <ul class="list-disc pl-4 space-y-1">
+             <li v-for="(desc, index) in [...new Set(detail.details.map(d => d.description).filter(d => d && !((Number(d.get_point) > 0 || Number(d.return_point) > 0))))]" :key="index">
+               {{ desc }}
+             </li>
+           </ul>
         </div>
+
       </div>
     </ModalSheet>
   </div>
