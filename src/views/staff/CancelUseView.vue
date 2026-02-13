@@ -101,8 +101,23 @@ const formatNumber = (n) => n == null ? '0' : Number(n).toLocaleString('th-TH');
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '-';
 
 async function searchDoc() {
-  // User entered a doc_no directly
-  selectedUseDoc.value = { doc_no: docNo.value.trim() };
+  if (!docNo.value.trim()) return;
+  error.value = '';
+  searching.value = true;
+  try {
+    const { data } = await pointApi.movementDetail(docNo.value.trim());
+    const h = data.header;
+    if (Number(h.use_point) <= 0) {
+      error.value = 'เอกสารนี้ไม่ใช่รายการใช้แต้ม';
+      selectedUseDoc.value = null;
+    } else {
+      selectedUseDoc.value = h;
+    }
+  } catch (err) {
+    error.value = err.response?.data?.error || 'ไม่พบเอกสาร';
+    selectedUseDoc.value = null;
+  }
+  searching.value = false;
 }
 
 async function searchCustomer() {

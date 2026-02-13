@@ -114,6 +114,7 @@
             <span v-if="Number(item.get_point) < 0" class="badge-return">{{ item.get_point }}</span>
             <span v-if="Number(item.use_point) > 0" class="badge-use">-{{ item.use_point }}</span>
             <span v-if="Number(item.use_point) < 0" class="badge-get">+{{ Math.abs(item.use_point) }}</span>
+            <span v-if="Number(item.return_point) > 0" class="badge-return">-{{ item.return_point }}</span>
           </div>
         </div>
       </div>
@@ -140,6 +141,22 @@
             <div>
               <span class="text-navy-400">วันที่:</span> <span class="text-navy-700">{{ formatDate(detail.header.doc_date) }}</span>
             </div>
+            <div v-if="Number(detail.header.get_point) > 0">
+              <span class="text-navy-400">แต้มที่ได้:</span> <span class="text-emerald-600 font-medium">+{{ detail.header.get_point }}</span>
+            </div>
+            <div v-if="Number(detail.header.return_point) > 0">
+              <span class="text-navy-400">แต้มที่คืน:</span> <span class="text-orange-600 font-medium">-{{ detail.header.return_point }}</span>
+            </div>
+          </div>
+
+          <!-- Point Details -->
+          <div v-if="detail && detail.details" class="mt-2 pt-2 border-t border-navy-100 space-y-1">
+             <div v-for="(d, index) in detail.details.filter(x => x.description && (Number(x.get_point) > 0 || Number(x.return_point) > 0))" :key="index" class="text-xs flex justify-between">
+                <span class="text-navy-500">{{ d.description }}</span>
+                <span :class="(Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? 'text-emerald-600' : 'text-orange-600'">
+                  {{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? '+' : '' }}{{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) }} pt
+                </span>
+             </div>
           </div>
         </div>
         <div class="space-y-2">
@@ -150,18 +167,16 @@
             </div>
             <div class="ml-3 text-right">
               <p class="text-sm font-medium text-navy-800">{{ formatCurrency(d.total_amount || d.sum_amount || 0) }}</p>
-              <p v-if="Number(d.get_point) > 0" class="text-xs text-emerald-600">+{{ d.get_point }} pt</p>
-              <p v-if="Number(d.return_point) > 0" class="text-xs text-orange-600">-{{ d.return_point }} pt</p>
             </div>
           </div>
         </div>
 
         <!-- Description from details -->
         <div class="mt-4 p-3 rounded-xl bg-navy-50 text-xs text-navy-600"
-          v-if="detail && detail.details && [...new Set(detail.details.map(d => d.description).filter(d => d))].length > 0">
-           <p class="font-semibold mb-1">รายละเอียดเพิ่มเติม</p>
+          v-if="detail && detail.details && [...new Set(detail.details.map(d => d.description).filter(d => d && !((Number(d.get_point) > 0 || Number(d.return_point) > 0))))].length > 0">
+           <p class="font-semibold mb-1">รายละเอียดรายรับแต้ม</p>
            <ul class="list-disc pl-4 space-y-1">
-             <li v-for="(desc, index) in [...new Set(detail.details.map(d => d.description).filter(d => d))]" :key="index">
+             <li v-for="(desc, index) in [...new Set(detail.details.map(d => d.description).filter(d => d && !((Number(d.get_point) > 0 || Number(d.return_point) > 0))))]" :key="index">
                {{ desc }}
              </li>
            </ul>
