@@ -42,7 +42,7 @@
           </div>
         </div>
         <div v-if="Number(item.sum_sale_amount) > 0 || Number(item.sum_return_amount) > 0" class="mt-2 pt-2 border-t border-navy-50 flex gap-4 text-xs text-navy-400">
-          <span v-if="Number(item.sum_sale_amount) > 0">ยอมขาย: {{ formatCurrency(item.sum_sale_amount) }}</span>
+          <span v-if="Number(item.sum_sale_amount) > 0">ยอดขาย: {{ formatCurrency(item.sum_sale_amount) }}</span>
           <span v-if="Number(item.sum_return_amount) > 0">ยอดคืน: {{ formatCurrency(item.sum_return_amount) }}</span>
         </div>
       </div>

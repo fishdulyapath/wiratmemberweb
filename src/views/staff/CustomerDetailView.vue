@@ -56,6 +56,7 @@
           <div>
             <p class="text-sm font-medium text-navy-700">{{ item.doc_no }}</p>
             <p class="text-navy-400">{{ formatDate(item.doc_date) }} {{ item.doc_time }}</p>
+            <p class="text-navy-400"><span class="text-xs">มูลค่า</span> {{ formatCurrency(item.total_amount) }}</p>
           </div>
           <svg class="w-4 h-4 text-navy-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -81,8 +82,9 @@
         <div class="flex justify-between items-center">
           <div>
             <p class="text-sm font-medium text-navy-700">{{ item.doc_no }}</p>
-            <p class="text-navy-400">{{ formatDate(item.doc_date) }}</p>
+            <p class="text-navy-400">{{ formatDate(item.doc_date) }}  {{ item.doc_time }}</p>
             <p v-if="item.doc_ref" class="text-amber-600">อ้างอิง: {{ item.doc_ref }}</p>
+            <p class="text-navy-400"><span class="text-xs">มูลค่า</span> {{ formatCurrency(item.total_amount) }}</p>
           </div>
           <svg class="w-4 h-4 text-navy-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />

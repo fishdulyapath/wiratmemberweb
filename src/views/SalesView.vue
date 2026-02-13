@@ -17,6 +17,7 @@
           <div>
             <p class="font-medium text-navy-700 text-sm">{{ item.doc_no }}</p>
             <p class="text-xs text-navy-400 mt-0.5">{{ formatDate(item.doc_date) }} {{ item.doc_time }}</p>
+            <p class="text-navy-400 mt-0.5"><span class="text-xs">มูลค่า</span> {{ formatCurrency(item.total_amount) }}</p>
           </div>
           <svg class="w-4 h-4 text-navy-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -50,7 +51,7 @@
           </div>
         </div>
         <div class="mt-2 pt-2 border-t border-navy-200">
-          <div class="mt-1 flex justify-between" v-if="detail.header.total_discount > 0 ">
+          <div class="mt-1 flex justify-between" v-if="detail.header.total_discount > 0">
             <span class="font-medium text-navy-600">ส่วนลด</span>
             <span class="font-display font-bold text-navy-800">
               {{ formatCurrency(detail.header.total_discount || 0) }}
