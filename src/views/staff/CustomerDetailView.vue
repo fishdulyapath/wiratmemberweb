@@ -135,7 +135,7 @@
         <div class="mb-4 p-3 rounded-xl bg-navy-50 text-xs space-y-1">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <span class="text-navy-400">เลขที่:</span> <span class="text-navy-700 font-medium">{{ detail.header.doc_no_sale || detail.header.doc_no_return }}</span>
+              <span class="text-navy-400">เลขที่:</span> <span class="text-navy-700 font-medium">{{ detail.header.doc_no_sale || detail.header.doc_no_return || detail.header.doc_no }}</span>
             </div>
             <div>
               <span class="text-navy-400">วันที่:</span> <span class="text-navy-700">{{ formatDate(detail.header.doc_date) }}</span>
@@ -149,12 +149,24 @@
               <p class="text-xs text-navy-400">{{ d.item_code }} · {{ d.qty }} {{ d.unit_code }}</p>
             </div>
             <div class="ml-3 text-right">
-              <p class="text-sm font-medium text-navy-800">{{ formatCurrency(d.total_amount || 0) }}</p>
+              <p class="text-sm font-medium text-navy-800">{{ formatCurrency(d.total_amount || d.sum_amount || 0) }}</p>
               <p v-if="Number(d.get_point) > 0" class="text-xs text-emerald-600">+{{ d.get_point }} pt</p>
               <p v-if="Number(d.return_point) > 0" class="text-xs text-orange-600">-{{ d.return_point }} pt</p>
             </div>
           </div>
         </div>
+
+        <!-- Description from details -->
+        <div class="mt-4 p-3 rounded-xl bg-navy-50 text-xs text-navy-600"
+          v-if="detail && detail.details && [...new Set(detail.details.map(d => d.description).filter(d => d))].length > 0">
+           <p class="font-semibold mb-1">รายละเอียดเพิ่มเติม</p>
+           <ul class="list-disc pl-4 space-y-1">
+             <li v-for="(desc, index) in [...new Set(detail.details.map(d => d.description).filter(d => d))]" :key="index">
+               {{ desc }}
+             </li>
+           </ul>
+        </div>
+
       </div>
     </ModalSheet>
   </div>
