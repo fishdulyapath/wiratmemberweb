@@ -16,14 +16,14 @@
           class="w-full px-4 py-2.5 text-left hover:bg-brand-50 transition-colors border-b border-navy-50 last:border-0"
           :class="selectedCustomer?.code === c.code ? 'bg-brand-50' : ''">
           <p class="text-sm font-medium text-navy-700">{{ c.name_1 }}</p>
-          <p class="text-xs text-navy-400">{{ c.code }} · แต้มคงเหลือ: <span class="font-semibold text-emerald-600">{{ formatNumber(c.point_balance) }}</span></p>
+          <p class="  text-navy-400">{{ c.code }} · แต้มคงเหลือ: <span class="font-semibold text-emerald-600">{{ formatNumber(c.point_balance) }}</span></p>
         </button>
       </div>
 
       <div v-if="selectedCustomer" class="p-4 rounded-xl bg-brand-50 border border-brand-100 relative">
         <div class="pr-8">
           <p class="text-sm font-medium text-brand-800">{{ selectedCustomer.name_1 }}</p>
-          <p class="text-xs text-brand-600">รหัส: {{ selectedCustomer.code }}</p>
+          <p class="  text-brand-600">รหัส: {{ selectedCustomer.code }}</p>
           <p class="text-lg font-display font-bold text-brand-700 mt-1">แต้มคงเหลือ: {{ formatNumber(selectedCustomer.point_balance) }}</p>
         </div>
         <button @click="clearCustomer" class="absolute top-3 right-3 p-1.5 rounded-lg text-brand-600 hover:bg-brand-100 transition-colors" title="ยกเลิกการเลือก">
@@ -36,7 +36,7 @@
       <div>
         <label class="block text-sm font-medium text-navy-600 mb-1.5">จำนวนแต้มที่ต้องการใช้</label>
         <input v-model.number="points" type="number" min="1" :max="selectedCustomer?.point_balance || 0" class="input-field" placeholder="0">
-        <p v-if="selectedCustomer && points > Number(selectedCustomer.point_balance)" class="text-xs text-red-500 mt-1">
+        <p v-if="selectedCustomer && points > Number(selectedCustomer.point_balance)" class="  text-red-500 mt-1">
           แต้มไม่เพียงพอ
         </p>
       </div>
@@ -54,8 +54,8 @@
 
       <div v-if="success" class="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
         <p class="text-sm font-medium text-emerald-700">ใช้แต้มสำเร็จ!</p>
-        <p class="text-xs text-emerald-600 mt-1">เลขที่: {{ success.doc_no }} · ใช้ {{ success.points_used }} แต้ม</p>
-        <p class="text-xs text-emerald-600">แต้มคงเหลือใหม่: {{ formatNumber(success.customer?.point_balance) }}</p>
+        <p class="  text-emerald-600 mt-1">เลขที่: {{ success.doc_no }} · ใช้ {{ success.points_used }} แต้ม</p>
+        <p class="  text-emerald-600">แต้มคงเหลือใหม่: {{ formatNumber(success.customer?.point_balance) }}</p>
       </div>
 
       <div v-if="error" class="p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600">{{ error }}</div>

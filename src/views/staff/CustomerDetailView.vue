@@ -8,24 +8,30 @@
     </button>
 
     <!-- Customer info -->
-    <div v-if="customer" class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-800 to-navy-900 p-6 text-white">
-      <div class="absolute top-0 right-0 w-48 h-48 bg-brand-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+    <div v-if="customer" class="relative overflow-hidden rounded-3xl text-white p-6 shadow-lg transition-all duration-300" :class="levelInfo.bgClass">
+      <div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
       <div class="relative">
         <h2 class="font-display text-xl font-bold">{{ customer.name_1 }}</h2>
-        <p class="text-navy-400 text-xs mt-0.5">รหัส: {{ customer.code }}</p>
+        <p class="text-white/60 mt-0.5">รหัส: {{ customer.code }}</p>
         <div class="mt-4 flex gap-6">
           <div>
-            <p class="text-brand-300 text-xs font-medium">แต้มคงเหลือ</p>
+            <p class="text-white/70 font-medium">แต้มคงเหลือ</p>
             <p class="font-display text-3xl font-bold mt-0.5">{{ formatNumber(customer.point_balance) }}</p>
           </div>
-          <div class="border-l border-navy-700 pl-6">
-            <p class="text-navy-400 text-xs font-medium">แต้มสะสมรวม</p>
-            <p class="font-display text-xl font-bold mt-0.5 text-navy-200">{{ formatNumber(customer.reward_point) }}</p>
+          <div class="border-l border-white/20 pl-6">
+            <p class="text-white/70 font-medium">แต้มสะสมรวม</p>
+            <p class="font-display text-xl font-bold mt-0.5 text-white/90">{{ formatNumber(customer.reward_point) }}</p>
           </div>
         </div>
-        <button @click="recalc" :disabled="recalcing" class="mt-4 text-xs text-brand-300 hover:text-brand-200 underline">
+        <button @click="recalc" :disabled="recalcing" class="mt-4 text-white/60 hover:text-white underline">
           {{ recalcing ? "กำลังคำนวณ..." : "คำนวณแต้มใหม่" }}
         </button>
+      </div>
+
+      <!-- Membership Level Badge -->
+      <div class="absolute bottom-6 right-6 text-right">
+        <p class="text-[10px] text-white/60 uppercase tracking-widest mb-0.5">Level</p>
+        <p class="font-display text-xl font-black italic tracking-wide text-white drop-shadow-md opacity-90">{{ levelInfo.name }}</p>
       </div>
     </div>
 
@@ -49,7 +55,7 @@
         <div class="flex justify-between items-center">
           <div>
             <p class="text-sm font-medium text-navy-700">{{ item.doc_no }}</p>
-            <p class="text-xs text-navy-400">{{ formatDate(item.doc_date) }} {{ item.doc_time }}</p>
+            <p class="text-navy-400">{{ formatDate(item.doc_date) }} {{ item.doc_time }}</p>
           </div>
           <svg class="w-4 h-4 text-navy-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -75,8 +81,8 @@
         <div class="flex justify-between items-center">
           <div>
             <p class="text-sm font-medium text-navy-700">{{ item.doc_no }}</p>
-            <p class="text-xs text-navy-400">{{ formatDate(item.doc_date) }}</p>
-            <p v-if="item.doc_ref" class="text-xs text-amber-600">อ้างอิง: {{ item.doc_ref }}</p>
+            <p class="text-navy-400">{{ formatDate(item.doc_date) }}</p>
+            <p v-if="item.doc_ref" class="text-amber-600">อ้างอิง: {{ item.doc_ref }}</p>
           </div>
           <svg class="w-4 h-4 text-navy-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -106,8 +112,8 @@
             <p class="text-sm font-medium text-navy-700 truncate" v-if="item.doc_no_return != null">{{ item.doc_no_return }}</p>
             <p class="text-sm font-medium text-navy-700 truncate" v-if="item.doc_no != null">{{ item.remark }}</p>
 
-            <p class="text-xs text-navy-400">{{ formatDate(item.doc_date) }} {{ item.doc_time }}</p>
-            <p class="text-xs text-navy-400">{{ item.doc_no }}</p>
+            <p class="text-navy-400">{{ formatDate(item.doc_date) }} {{ item.doc_time }}</p>
+            <p class="text-navy-400">{{ item.doc_no }}</p>
           </div>
           <div class="ml-3 flex flex-col gap-1">
             <span v-if="Number(item.get_point) > 0" class="badge-get">+{{ item.get_point }}</span>
@@ -133,13 +139,14 @@
     <!-- Detail modal -->
     <ModalSheet :show="!!selectedDoc" :title="selectedDoc" :subtitle="modalSubtitle" :loading="detailLoading" @close="selectedDoc = null">
       <div v-if="detail">
-        <div class="mb-4 p-3 rounded-xl bg-navy-50 text-xs space-y-1">
+        <div class="mb-4 p-3 rounded-xl bg-navy-50 space-y-1">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <span class="text-navy-400">เลขที่:</span> <span class="text-navy-700 font-medium">{{ detail.header.doc_no_sale || detail.header.doc_no_return || detail.header.doc_no }}</span>
+              <span class="text-navy-400 text-xs">เลขที่:</span>
+              <span class="text-navy-700 font-medium text-xs">{{ detail.header.doc_no_sale || detail.header.doc_no_return || detail.header.doc_no }}</span>
             </div>
             <div>
-              <span class="text-navy-400">วันที่:</span> <span class="text-navy-700">{{ formatDate(detail.header.doc_date) }}</span>
+              <span class="text-navy-400 text-xs">วันที่:</span> <span class="text-navy-700 text-xs">{{ formatDate(detail.header.doc_date) }}</span>
             </div>
             <div v-if="Number(detail.header.get_point) > 0">
               <span class="text-navy-400">แต้มที่ได้:</span> <span class="text-emerald-600 font-medium">+{{ detail.header.get_point }}</span>
@@ -151,19 +158,19 @@
 
           <!-- Point Details -->
           <div v-if="detail && detail.details" class="mt-2 pt-2 border-t border-navy-100 space-y-1">
-             <div v-for="(d, index) in detail.details.filter(x => x.description && (Number(x.get_point) > 0 || Number(x.return_point) > 0))" :key="index" class="text-xs flex justify-between">
-                <span class="text-navy-500">{{ d.description }}</span>
-                <span :class="(Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? 'text-emerald-600' : 'text-orange-600'">
-                  {{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? '+' : '' }}{{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) }} pt
-                </span>
-             </div>
+            <div v-for="(d, index) in detail.details.filter((x) => x.description && (Number(x.get_point) > 0 || Number(x.return_point) > 0))" :key="index" class="flex justify-between">
+              <span class="text-navy-500">{{ d.description }}</span>
+              <span :class="(Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? 'text-emerald-600' : 'text-orange-600'">
+                {{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) > 0 ? "+" : "" }}{{ (Number(d.get_point) || 0) - (Number(d.return_point) || 0) }} pt
+              </span>
+            </div>
           </div>
         </div>
         <div class="space-y-2">
           <div v-for="(d, i) in detail.details" :key="i" class="flex items-start justify-between py-2 border-b border-navy-50 last:border-0">
             <div class="flex-1 min-w-0">
               <p class="text-sm text-navy-700 truncate">{{ d.item_name }}</p>
-              <p class="text-xs text-navy-400">{{ d.item_code }} · {{ d.qty }} {{ d.unit_code }}</p>
+              <p class="text-navy-400">{{ d.item_code }} · {{ d.qty }} {{ d.unit_code }}</p>
             </div>
             <div class="ml-3 text-right">
               <p class="text-sm font-medium text-navy-800">{{ formatCurrency(d.total_amount || d.sum_amount || 0) }}</p>
@@ -172,23 +179,30 @@
         </div>
 
         <!-- Description from details -->
-        <div class="mt-4 p-3 rounded-xl bg-navy-50 text-xs text-navy-600"
-          v-if="detail && detail.details && [...new Set(detail.details.map(d => d.description).filter(d => d && !((Number(d.get_point) > 0 || Number(d.return_point) > 0))))].length > 0">
-           <p class="font-semibold mb-1">รายละเอียดรายรับแต้ม</p>
-           <ul class="list-disc pl-4 space-y-1">
-             <li v-for="(desc, index) in [...new Set(detail.details.map(d => d.description).filter(d => d && !((Number(d.get_point) > 0 || Number(d.return_point) > 0))))]" :key="index">
-               {{ desc }}
-             </li>
-           </ul>
+        <div
+          class="mt-4 p-3 rounded-xl bg-navy-50 text-navy-600"
+          v-if="detail && detail.details && [...new Set(detail.details.map((d) => d.description).filter((d) => d && !(Number(d.get_point) > 0 || Number(d.return_point) > 0)))].length > 0"
+        >
+          <p class="font-semibold mb-1">รายละเอียดรายรับแต้ม</p>
+          <ul class="list-disc pl-4 space-y-1">
+            <li v-for="(desc, index) in [...new Set(detail.details.map((d) => d.description).filter((d) => d && !(Number(d.get_point) > 0 || Number(d.return_point) > 0)))]" :key="index">
+              {{ desc }}
+            </li>
+          </ul>
         </div>
-
+        <div class="mt-4 pt-3 border-t border-navy-200 flex justify-between">
+          <span class="font-medium text-navy-600">รวมทั้งสิ้น</span>
+          <span class="font-display font-bold text-navy-800">
+            {{ formatCurrency(detail.header.total_amount || detail.header.sum_total_amount || 0) }}
+          </span>
+        </div>
       </div>
     </ModalSheet>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { customerApi, transactionApi, pointApi } from "../../api";
 import ModalSheet from "../../components/ModalSheet.vue";
@@ -214,6 +228,31 @@ const returnsTotalPages = ref(1);
 const points = ref([]);
 const pointsPage = ref(1);
 const pointsTotalPages = ref(1);
+
+const levelInfo = computed(() => {
+  const points = Number(customer.value?.reward_point || 0);
+  if (points >= 2000) {
+    return {
+      name: "PLATINUM",
+      bgClass: "bg-gradient-to-br from-slate-700 via-slate-800 to-black",
+    };
+  } else if (points >= 800) {
+    return {
+      name: "GOLD",
+      bgClass: "bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-600",
+    };
+  } else if (points >= 300) {
+    return {
+      name: "SILVER",
+      bgClass: "bg-gradient-to-br from-gray-300 via-gray-400 to-slate-500",
+    };
+  } else {
+    return {
+      name: "COPPER",
+      bgClass: "bg-gradient-to-br from-orange-300 via-orange-400 to-amber-600",
+    };
+  }
+});
 
 const selectedDoc = ref(null);
 const modalSubtitle = ref("");

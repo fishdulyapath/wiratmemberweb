@@ -17,11 +17,11 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="font-medium text-navy-700">{{ c.name_1 }}</p>
-            <p class="text-xs text-navy-400 mt-0.5">รหัส: {{ c.code }}</p>
+            <p class="  text-navy-400 mt-0.5">รหัส: {{ c.code }}</p>
           </div>
           <div class="text-right">
             <p class="text-sm font-bold text-emerald-600">{{ formatNumber(c.point_balance) }}</p>
-            <p class="text-xs text-navy-400">แต้มคงเหลือ</p>
+            <p class="  text-navy-400">แต้มคงเหลือ</p>
           </div>
         </div>
       </router-link>

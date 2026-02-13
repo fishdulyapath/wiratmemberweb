@@ -24,7 +24,7 @@
         <form @submit.prevent="handleLogin" class="space-y-6">
           <div class="space-y-4">
             <div>
-              <label class="block text-xs font-semibold text-navy-500 uppercase tracking-wider mb-2 ml-1">ชื่อผู้ใช้</label>
+              <label class="block   font-semibold text-navy-500 uppercase tracking-wider mb-2 ml-1">ชื่อผู้ใช้</label>
               <input 
                 v-model="username" 
                 type="text" 
@@ -36,7 +36,7 @@
             </div>
             <div>
               <div class="flex items-center justify-between mb-2 ml-1">
-                <label class="block text-xs font-semibold text-navy-500 uppercase tracking-wider">รหัสผ่าน</label>
+                <label class="block   font-semibold text-navy-500 uppercase tracking-wider">รหัสผ่าน</label>
               </div>
               <input 
                 v-model="password" 
@@ -72,7 +72,7 @@
         </form>
       </div>
       
-      <p class="text-center mt-8 text-xs text-navy-400 font-medium">
+      <p class="text-center mt-8   text-navy-400 font-medium">
         © 2026 Wirat Member System. All rights reserved.
       </p>
     </div>

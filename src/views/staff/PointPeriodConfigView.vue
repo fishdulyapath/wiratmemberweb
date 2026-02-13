@@ -57,8 +57,8 @@
               <p class="text-sm font-medium text-navy-700">
                 {{ formatDate(period.start_date) }} — {{ formatDate(period.end_date) }}
               </p>
-              <p v-if="period.remark" class="text-xs text-navy-400 mt-0.5">{{ period.remark }}</p>
-              <p class="text-xs text-navy-400 mt-0.5">
+              <p v-if="period.remark" class="  text-navy-400 mt-0.5">{{ period.remark }}</p>
+              <p class="  text-navy-400 mt-0.5">
                 สร้างโดย: {{ period.created_by || '-' }}
               </p>
             </template>
@@ -67,16 +67,16 @@
           <!-- ปุ่มจัดการ -->
           <div class="flex items-center gap-2 mt-3 sm:mt-0 sm:ml-4">
             <template v-if="editing === period.id">
-              <button @click="saveEdit(period.id)" class="btn-primary text-xs px-3 py-1.5">บันทึก</button>
-              <button @click="editing = null" class="btn-secondary text-xs px-3 py-1.5">ยกเลิก</button>
+              <button @click="saveEdit(period.id)" class="btn-primary   px-3 py-1.5">บันทึก</button>
+              <button @click="editing = null" class="btn-secondary   px-3 py-1.5">ยกเลิก</button>
             </template>
             <template v-else>
-              <button @click="toggleActive(period)" class="text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
+              <button @click="toggleActive(period)" class="  px-3 py-1.5 rounded-lg font-medium transition-colors"
                 :class="period.is_active ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-navy-100 text-navy-500 hover:bg-navy-200'">
                 {{ period.is_active ? 'เปิดใช้' : 'ปิดใช้' }}
               </button>
-              <button @click="startEdit(period)" class="btn-secondary text-xs px-3 py-1.5">แก้ไข</button>
-              <button @click="deletePeriod(period.id)" class="btn-danger text-xs px-3 py-1.5">ลบ</button>
+              <button @click="startEdit(period)" class="btn-secondary   px-3 py-1.5">แก้ไข</button>
+              <button @click="deletePeriod(period.id)" class="btn-danger   px-3 py-1.5">ลบ</button>
             </template>
           </div>
         </div>

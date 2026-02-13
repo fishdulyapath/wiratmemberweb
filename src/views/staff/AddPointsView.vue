@@ -18,7 +18,7 @@
           class="w-full px-4 py-2.5 text-left hover:bg-brand-50 transition-colors border-b border-navy-50 last:border-0"
           :class="selectedCustomer?.code === c.code ? 'bg-brand-50' : ''">
           <p class="text-sm font-medium text-navy-700">{{ c.name_1 }}</p>
-          <p class="text-xs text-navy-400">{{ c.code }} · แต้มคงเหลือ: {{ formatNumber(c.point_balance) }}</p>
+          <p class="  text-navy-400">{{ c.code }} · แต้มคงเหลือ: {{ formatNumber(c.point_balance) }}</p>
         </button>
       </div>
 
@@ -26,7 +26,7 @@
       <div v-if="selectedCustomer" class="p-4 rounded-xl bg-emerald-50 border border-emerald-100 flex justify-between items-center">
         <div>
           <p class="text-sm font-medium text-emerald-800">{{ selectedCustomer.name_1 }}</p>
-          <p class="text-xs text-emerald-600">รหัส: {{ selectedCustomer.code }} · แต้มคงเหลือ: {{ formatNumber(selectedCustomer.point_balance) }}</p>
+          <p class="  text-emerald-600">รหัส: {{ selectedCustomer.code }} · แต้มคงเหลือ: {{ formatNumber(selectedCustomer.point_balance) }}</p>
         </div>
         <button @click="clearCustomer" class="p-2 rounded-lg text-emerald-600 hover:bg-emerald-100 transition-colors" title="ยกเลิกการเลือก">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -53,8 +53,8 @@
       <!-- Success message -->
       <div v-if="success" class="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
         <p class="text-sm font-medium text-emerald-700">เพิ่มแต้มสำเร็จ!</p>
-        <p class="text-xs text-emerald-600 mt-1">เลขที่: {{ success.doc_no }} · เพิ่ม {{ success.points_added }} แต้ม</p>
-        <p class="text-xs text-emerald-600">แต้มคงเหลือใหม่: {{ formatNumber(success.customer?.point_balance) }}</p>
+        <p class="  text-emerald-600 mt-1">เลขที่: {{ success.doc_no }} · เพิ่ม {{ success.points_added }} แต้ม</p>
+        <p class="  text-emerald-600">แต้มคงเหลือใหม่: {{ formatNumber(success.customer?.point_balance) }}</p>
       </div>
 
       <div v-if="error" class="p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600">{{ error }}</div>

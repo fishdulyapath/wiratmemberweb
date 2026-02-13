@@ -9,13 +9,10 @@
       </svg>
     </div>
 
-    <div v-else-if="items.length === 0" class="card text-center py-12 text-navy-400">
-      ไม่พบข้อมูลการซื้อสินค้า
-    </div>
+    <div v-else-if="items.length === 0" class="card text-center py-12 text-navy-400">ไม่พบข้อมูลการซื้อสินค้า</div>
 
     <div v-else class="space-y-3">
-      <div v-for="item in items" :key="item.doc_no" @click="openDetail(item.doc_no)"
-        class="card cursor-pointer hover:shadow-md hover:border-brand-200 transition-all">
+      <div v-for="item in items" :key="item.doc_no" @click="openDetail(item.doc_no)" class="card cursor-pointer hover:shadow-md hover:border-brand-200 transition-all">
         <div class="flex items-center justify-between">
           <div>
             <p class="font-medium text-navy-700 text-sm">{{ item.doc_no }}</p>
@@ -35,8 +32,12 @@
       <div v-if="detail">
         <div class="mb-4 p-3 rounded-xl bg-navy-50">
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <div><span class="text-navy-400">เลขที่:</span> <span class="text-navy-700 font-medium">{{ detail.header.doc_no }}</span></div>
-            <div><span class="text-navy-400">วันที่:</span> <span class="text-navy-700">{{ formatDate(detail.header.doc_date) }}</span></div>
+            <div>
+              <span class="text-navy-400">เลขที่:</span> <span class="text-navy-700 font-medium">{{ detail.header.doc_no }}</span>
+            </div>
+            <div>
+              <span class="text-navy-400">วันที่:</span> <span class="text-navy-700">{{ formatDate(detail.header.doc_date) }}</span>
+            </div>
           </div>
         </div>
         <div class="space-y-2">
@@ -48,11 +49,19 @@
             <p class="text-sm font-medium text-navy-800 ml-3 whitespace-nowrap">{{ formatCurrency(d.sum_amount) }}</p>
           </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-navy-200 flex justify-between">
-          <span class="font-medium text-navy-600">รวมทั้งสิ้น</span>
-          <span class="font-display font-bold text-navy-800">
-            {{ formatCurrency(detail.details.reduce((s, d) => s + Number(d.sum_amount || 0), 0)) }}
-          </span>
+        <div class="mt-2 pt-2 border-t border-navy-200">
+          <div class="mt-1 flex justify-between" v-if="detail.header.total_discount > 0 ">
+            <span class="font-medium text-navy-600">ส่วนลด</span>
+            <span class="font-display font-bold text-navy-800">
+              {{ formatCurrency(detail.header.total_discount || 0) }}
+            </span>
+          </div>
+          <div class="mt-1 flex justify-between">
+            <span class="font-medium text-navy-600">รวมทั้งสิ้น</span>
+            <span class="font-display font-bold text-navy-800">
+              {{ formatCurrency(detail.header.total_amount || detail.header.sum_total_amount || 0) }}
+            </span>
+          </div>
         </div>
       </div>
     </ModalSheet>
@@ -60,11 +69,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useAuthStore } from '../stores/auth';
-import { transactionApi } from '../api';
-import ModalSheet from '../components/ModalSheet.vue';
-import Pagination from '../components/Pagination.vue';
+import { ref, onMounted } from "vue";
+import { useAuthStore } from "../stores/auth";
+import { transactionApi } from "../api";
+import ModalSheet from "../components/ModalSheet.vue";
+import Pagination from "../components/Pagination.vue";
 
 const auth = useAuthStore();
 const items = ref([]);
@@ -75,8 +84,8 @@ const selectedDoc = ref(null);
 const detailLoading = ref(false);
 const detail = ref(null);
 
-const formatDate = (d) => d ? new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '-';
-const formatCurrency = (n) => Number(n || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 });
+const formatDate = (d) => (d ? new Date(d).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" }) : "-");
+const formatCurrency = (n) => Number(n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2 });
 
 async function fetchData() {
   loading.value = true;

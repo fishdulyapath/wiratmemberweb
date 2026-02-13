@@ -3,29 +3,36 @@
     <!-- Member Dashboard -->
     <template v-if="auth.isMember">
       <!-- Point balance hero card -->
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-800 via-navy-900 to-navy-900 p-6 sm:p-8 text-white">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div class="absolute bottom-0 left-0 w-48 h-48 bg-brand-400/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+      <div class="relative overflow-hidden rounded-3xl p-6 sm:p-8 text-white transition-all duration-500 shadow-xl shadow-navy-200"
+        :class="levelInfo.bgClass">
+        
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
         <div class="relative">
-          <p class="text-navy-300 text-sm font-medium">สวัสดี,</p>
           <h2 class="font-display text-xl sm:text-2xl font-bold mt-0.5">{{ customer?.name_1 || auth.user?.display_name }}</h2>
-          <p class="text-navy-400 text-xs mt-1">รหัสสมาชิก: {{ customer?.code }}</p>
+          <p class="text-white/60 text-xs  mt-1">รหัสสมาชิก: {{ customer?.code }}</p>
 
           <div class="mt-6 flex flex-col sm:flex-row gap-6">
             <div>
-              <p class="text-brand-300 text-xs font-medium uppercase tracking-wider">แต้มคงเหลือ</p>
-              <p class="font-display text-4xl sm:text-5xl font-bold mt-1">
+              <p class="text-white/70 text-xs  font-medium uppercase tracking-wider">แต้มคงเหลือ</p>
+              <p class="font-display text-4xl sm:text-5xl font-bold mt-1 text-white">
                 {{ formatNumber(customer?.point_balance) }}
               </p>
             </div>
-            <div class="sm:border-l sm:border-navy-700 sm:pl-6">
-              <p class="text-navy-400 text-xs font-medium uppercase tracking-wider">แต้มสะสมทั้งหมด</p>
-              <p class="font-display text-2xl font-bold mt-1 text-navy-200">
+            <div class="sm:border-l sm:border-white/20 sm:pl-6">
+              <p class="text-white/70 text-xs  font-medium uppercase tracking-wider">แต้มสะสมทั้งหมด</p>
+              <p class="font-display text-2xl font-bold mt-1 text-white/90">
                 {{ formatNumber(customer?.reward_point) }}
               </p>
             </div>
           </div>
+        </div>
+
+        <!-- Membership Level Badge -->
+        <div class="absolute bottom-6 right-6 text-right">
+             <p class="  text-white/60 uppercase tracking-widest text-xs mb-1">Membership</p>
+             <p class="font-display text-2xl font-black italic tracking-wide text-white drop-shadow-lg opacity-90">{{ levelInfo.name }}</p>
         </div>
       </div>
 
@@ -37,7 +44,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
             </svg>
           </div>
-          <p class="text-xs font-medium text-navy-600 mt-2">ประวัติซื้อ</p>
+          <p class="  font-medium text-navy-600 text-xs mt-2">ประวัติซื้อ</p>
         </router-link>
         <router-link to="/returns" class="card text-center hover:shadow-md transition-shadow group">
           <div class="w-10 h-10 mx-auto rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -45,7 +52,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
             </svg>
           </div>
-          <p class="text-xs font-medium text-navy-600 mt-2">ประวัติคืน</p>
+          <p class="  font-medium text-navy-600 text-xs mt-2">ประวัติคืน</p>
         </router-link>
         <router-link to="/points" class="card text-center hover:shadow-md transition-shadow group">
           <div class="w-10 h-10 mx-auto rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -53,7 +60,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
             </svg>
           </div>
-          <p class="text-xs font-medium text-navy-600 mt-2">แต้มสะสม</p>
+          <p class="  font-medium text-navy-600 text-xs  mt-2">แต้มสะสม</p>
         </router-link>
       </div>
 
@@ -70,13 +77,13 @@
           <div v-for="item in recentPoints" :key="item.doc_no" class="flex items-center justify-between py-2 border-b border-navy-50 last:border-0">
             <div>
               <p class="text-sm font-medium text-navy-700">{{ item.remark || item.doc_no }}</p>
-              <p class="text-xs text-navy-400">{{ formatDate(item.doc_date) }}</p>
+              <p class="  text-navy-400">{{ formatDate(item.doc_date) }}</p>
             </div>
             <div class="text-right">
               <span v-if="item.get_point > 0" class="badge-get">+{{ item.get_point }}</span>
               <span v-else-if="item.get_point < 0" class="badge-return">{{ item.get_point }}</span>
               <span v-if="item.use_point > 0" class="badge-use">-{{ item.use_point }}</span>
-              <span v-if="item.use_point < 0" class="badge-get">+{{ Math.abs(item.use_point) }} (คืน)</span>
+              <span v-if="item.use_point < 0" class="badge-get">+{{ Math.abs(item.use_point) }}</span>
             </div>
           </div>
         </div>
@@ -88,9 +95,8 @@
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-700 to-navy-900 p-6 sm:p-8 text-white">
         <div class="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div class="relative">
-          <p class="text-navy-300 text-sm">สวัสดี,</p>
           <h2 class="font-display text-2xl font-bold mt-0.5">{{ auth.user?.display_name }}</h2>
-          <p class="text-navy-400 text-xs mt-1">พนักงาน</p>
+          <p class="text-navy-400   mt-1">พนักงาน</p>
         </div>
       </div>
 
@@ -142,7 +148,7 @@
         <div class="flex items-center justify-between">
           <div>
             <h3 class="font-display font-semibold text-navy-800">คำนวณแต้มด้วยตนเอง</h3>
-            <p class="text-xs text-navy-400 mt-0.5">ระบบคำนวณอัตโนมัติทุก 30 นาที</p>
+            <p class="  text-navy-400 mt-0.5">ระบบคำนวณอัตโนมัติทุก 30 นาที</p>
           </div>
           <button @click="processAll" :disabled="processing" class="btn-primary">
             {{ processing ? 'กำลังคำนวณ...' : 'คำนวณเดี๋ยวนี้' }}
@@ -176,6 +182,31 @@ const formatDate = (d) => {
   if (!d) return '-';
   return new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
 };
+
+const levelInfo = computed(() => {
+  const points = Number(customer.value?.reward_point || 0);
+  if (points >= 2000) {
+    return {
+      name: 'PLATINUM',
+      bgClass: 'bg-gradient-to-br from-slate-700 via-slate-800 to-black',
+    };
+  } else if (points >= 800) {
+    return {
+      name: 'GOLD',
+      bgClass: 'bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-600',
+    };
+  } else if (points >= 300) {
+    return {
+      name: 'SILVER',
+      bgClass: 'bg-gradient-to-br from-gray-300 via-gray-400 to-slate-500',
+    };
+  } else {
+    return {
+      name: 'COPPER',
+      bgClass: 'bg-gradient-to-br from-orange-300 via-orange-400 to-amber-600',
+    };
+  }
+});
 
 onMounted(async () => {
   if (auth.isMember) {

@@ -21,7 +21,7 @@
       <!-- Or search by customer first -->
       <div class="relative">
         <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-navy-200"></div></div>
-        <div class="relative flex justify-center"><span class="bg-white px-3 text-xs text-navy-400">หรือค้นหาจากสมาชิก</span></div>
+        <div class="relative flex justify-center"><span class="bg-white px-3   text-navy-400">หรือค้นหาจากสมาชิก</span></div>
       </div>
 
       <div>
@@ -36,21 +36,21 @@
         <button v-for="c in searchResults" :key="c.code" @click="selectCustomer(c)"
           class="w-full px-4 py-2.5 text-left hover:bg-brand-50 transition-colors border-b border-navy-50 last:border-0">
           <p class="text-sm font-medium text-navy-700">{{ c.name_1 }}</p>
-          <p class="text-xs text-navy-400">{{ c.code }}</p>
+          <p class="  text-navy-400">{{ c.code }}</p>
         </button>
       </div>
 
       <!-- Use-point docs list for selected customer -->
       <div v-if="useDocs.length > 0" class="space-y-2">
-        <h4 class="text-xs font-medium text-navy-500 uppercase tracking-wider">รายการใช้แต้ม</h4>
+        <h4 class="  font-medium text-navy-500 uppercase tracking-wider">รายการใช้แต้ม</h4>
         <button v-for="doc in useDocs" :key="doc.doc_no" @click="selectDoc(doc)"
           class="w-full card text-left hover:shadow-md transition-all"
           :class="selectedUseDoc?.doc_no === doc.doc_no ? 'ring-2 ring-brand-400' : ''">
           <div class="flex justify-between items-center">
             <div>
               <p class="text-sm font-medium text-navy-700">{{ doc.doc_no }}</p>
-              <p class="text-xs text-navy-400">{{ formatDate(doc.doc_date) }} {{ doc.doc_time }}</p>
-              <p v-if="doc.remark" class="text-xs text-navy-400 mt-0.5 truncate">{{ doc.remark }}</p>
+              <p class="  text-navy-400">{{ formatDate(doc.doc_date) }} {{ doc.doc_time }}</p>
+              <p v-if="doc.remark" class="  text-navy-400 mt-0.5 truncate">{{ doc.remark }}</p>
             </div>
             <span class="badge-use">ใช้ {{ doc.use_point }} แต้ม</span>
           </div>
@@ -60,7 +60,7 @@
       <!-- Selected doc to cancel -->
       <div v-if="selectedUseDoc" class="p-4 rounded-xl bg-red-50 border border-red-100">
         <p class="text-sm font-medium text-red-800">ยืนยันยกเลิกการใช้แต้ม</p>
-        <div class="mt-2 space-y-1 text-xs text-red-700">
+        <div class="mt-2 space-y-1   text-red-700">
           <p>เลขที่: <span class="font-semibold">{{ selectedUseDoc.doc_no }}</span></p>
           <p>สมาชิก: <span class="font-semibold">{{ selectedUseDoc.cust_code }}</span></p>
           <p>จำนวนแต้มที่จะคืน: <span class="font-semibold text-lg">{{ selectedUseDoc.use_point }}</span></p>
@@ -73,9 +73,9 @@
 
       <div v-if="success" class="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
         <p class="text-sm font-medium text-emerald-700">ยกเลิกการใช้แต้มสำเร็จ!</p>
-        <p class="text-xs text-emerald-600 mt-1">เลขที่ใหม่: {{ success.doc_no }}</p>
-        <p class="text-xs text-emerald-600">คืน {{ success.points_refunded }} แต้ม</p>
-        <p class="text-xs text-emerald-600">แต้มคงเหลือใหม่: {{ formatNumber(success.customer?.point_balance) }}</p>
+        <p class="  text-emerald-600 mt-1">เลขที่ใหม่: {{ success.doc_no }}</p>
+        <p class="  text-emerald-600">คืน {{ success.points_refunded }} แต้ม</p>
+        <p class="  text-emerald-600">แต้มคงเหลือใหม่: {{ formatNumber(success.customer?.point_balance) }}</p>
       </div>
 
       <div v-if="error" class="p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600">{{ error }}</div>
@@ -132,8 +132,18 @@ async function selectCustomer(c) {
   searchResults.value = [];
   // Fetch use-point transactions for this customer
   try {
-    const { data } = await pointApi.movement({ cust_code: c.code, limit: 50 });
-    useDocs.value = data.data.filter(d => Number(d.use_point) > 0);
+    const { data } = await pointApi.movement({ cust_code: c.code, limit: 100 });
+    const all = data.data;
+    // หา doc_no ที่ถูกยกเลิกแล้ว (remark ของ reversal จะขึ้นต้นด้วย "ยกเลิกการใช้แต้ม อ้างอิง <doc_no>")
+    const cancelledDocNos = new Set(
+      all.filter(d => Number(d.use_point) < 0 && d.remark)
+        .map(d => {
+          const m = d.remark.match(/อ้างอิง\s+(PT-[^\s]+)/);
+          return m ? m[1] : null;
+        })
+        .filter(Boolean)
+    );
+    useDocs.value = all.filter(d => Number(d.use_point) > 0 && !cancelledDocNos.has(d.doc_no));
   } catch {}
 }
 
