@@ -21,6 +21,26 @@
           <p class="text-navy-400 text-sm mt-2">เข้าสู่ระบบสะสมแต้ม Wirat Member</p>
         </div>
 
+        <!-- Login Mode Toggle -->
+        <div class="flex bg-navy-50/50 rounded-xl p-1 border border-navy-100 mb-8">
+          <button
+            type="button"
+            @click="loginMode = 'member'"
+            class="flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all duration-200"
+            :class="loginMode === 'member' ? 'bg-white text-brand-600 shadow-sm' : 'text-navy-400 hover:text-navy-600'"
+          >
+            สมาชิก
+          </button>
+          <button
+            type="button"
+            @click="loginMode = 'staff'"
+            class="flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all duration-200"
+            :class="loginMode === 'staff' ? 'bg-white text-brand-600 shadow-sm' : 'text-navy-400 hover:text-navy-600'"
+          >
+            พนักงาน
+          </button>
+        </div>
+
         <form @submit.prevent="handleLogin" class="space-y-6">
           <div class="space-y-4">
             <div>
@@ -89,6 +109,7 @@ const auth = useAuthStore();
 
 const username = ref('');
 const password = ref('');
+const loginMode = ref('member');
 const error = ref('');
 const loading = ref(false);
 
@@ -96,7 +117,7 @@ async function handleLogin() {
   error.value = '';
   loading.value = true;
   try {
-    await auth.login(username.value, password.value);
+    await auth.login(username.value, password.value, loginMode.value);
     router.push('/');
   } catch (err) {
     if (err.response && err.response.data && err.response.data.error) {
