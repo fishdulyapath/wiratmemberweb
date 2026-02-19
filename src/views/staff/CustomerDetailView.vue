@@ -232,48 +232,53 @@
     <!-- Detail modal -->
     <ModalSheet :show="!!selectedDoc" :title="selectedDoc" :subtitle="modalSubtitle" :loading="detailLoading" @close="selectedDoc = null">
       <div v-if="detail">
-        <div class="mb-4 p-3 rounded-xl bg-navy-50 space-y-1">
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <span class="text-navy-400 text-xs">เลขที่:</span>
-              <span class="text-navy-700 font-medium text-xs">{{ detail.header.doc_no_sale || detail.header.doc_no_return || detail.header.doc_no }}</span>
-            </div>
-            <div>
-              <span class="text-navy-400 text-xs">วันที่:</span> <span class="text-navy-700 text-xs">{{ formatDate(detail.header.doc_date) }}</span>
-            </div>
-            <div v-if="Number(detail.header.get_point) > 0">
-              <span class="text-navy-400">แต้มที่ได้:</span> <span class="text-emerald-600 font-medium">+{{ detail.header.get_point }}</span>
-            </div>
-            <div v-if="Number(detail.header.return_point) > 0">
-              <span class="text-navy-400">แต้มที่คืน:</span> <span class="text-orange-600 font-medium">-{{ detail.header.return_point }}</span>
+        <!-- Sale / Return detail -->
+        <template v-if="modalSubtitle !== 'รายละเอียดแต้ม'">
+          <div class="mb-3 p-3 rounded-xl bg-navy-50 text-xs flex gap-4">
+            <div><span class="text-navy-400">วันที่: </span><span class="text-navy-700">{{ formatDate(detail.header.doc_date) }}</span></div>
+          </div>
+          <div class="space-y-2">
+            <div v-for="(d, i) in detail.details" :key="i" class="flex items-start justify-between py-2 border-b border-navy-50 last:border-0">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-navy-700 truncate">{{ d.item_name }}</p>
+                <p class="text-xs text-navy-400">{{ d.item_code }} · {{ d.qty }} {{ d.unit_code }}</p>
+              </div>
+              <p class="text-sm font-medium text-navy-800 ml-3 whitespace-nowrap">{{ formatCurrency(d.total_amount || d.sum_amount || 0) }}</p>
             </div>
           </div>
+          <div class="mt-3 pt-3 border-t border-navy-200 flex justify-between">
+            <span class="font-medium text-navy-600">รวมทั้งสิ้น</span>
+            <span class="font-display font-bold text-navy-800">{{ formatCurrency(detail.header.total_amount || detail.header.sum_total_amount || 0) }}</span>
+          </div>
+        </template>
 
-          <!-- Point condition descriptions -->
-          <div v-if="detail && detail.details && [...new Set(detail.details.map(d => d.description).filter(Boolean))].length > 0" class="mt-2 pt-2 border-t border-navy-100 space-y-1">
-            <div v-for="(desc, index) in [...new Set(detail.details.map(d => d.description).filter(Boolean))]" :key="index" class="flex justify-between">
-              <span class="text-navy-500">{{ desc }}</span>
+        <!-- Point detail — grouped by description -->
+        <template v-else>
+          <div class="mb-3 p-3 rounded-xl bg-navy-50 text-xs flex gap-4">
+            <div><span class="text-navy-400">วันที่: </span><span class="text-navy-700">{{ formatDate(detail.header.doc_date) }}</span></div>
+            <div v-if="Number(detail.header.get_point) > 0"><span class="text-emerald-600 font-medium">+{{ detail.header.get_point }} แต้ม</span></div>
+            <div v-if="Number(detail.header.return_point) > 0"><span class="text-orange-600 font-medium">-{{ detail.header.return_point }} แต้ม</span></div>
+          </div>
+          <div class="space-y-1">
+            <div v-for="(group, gi) in groupedDetails(detail.details)" :key="gi">
+              <div v-for="(d, di) in group.items" :key="`item-${gi}-${di}`" class="flex items-start justify-between py-2 border-b border-navy-50">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-navy-700 truncate">{{ d.item_name }}</p>
+                  <p class="text-xs text-navy-400">{{ d.item_code }} · {{ d.qty }} {{ d.unit_code }}</p>
+                </div>
+                <p class="text-sm font-medium text-navy-800 ml-3 whitespace-nowrap">{{ formatCurrency(d.total_amount || d.sum_amount || 0) }}</p>
+              </div>
+              <div class="flex items-center justify-between py-1.5 px-2 bg-emerald-50 rounded-lg mt-1 mb-2">
+                <span class="text-xs text-emerald-700">{{ group.description || 'รวม' }}</span>
+                <span class="text-xs font-medium text-emerald-700">{{ formatCurrency(group.total) }}</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="space-y-2">
-          <div v-for="(d, i) in detail.details" :key="i" class="flex items-start justify-between py-2 border-b border-navy-50 last:border-0">
-            <div class="flex-1 min-w-0">
-              <p class="text-sm text-navy-700 truncate">{{ d.item_name }}</p>
-              <p class="text-navy-400">{{ d.item_code }} · {{ d.qty }} {{ d.unit_code }}</p>
-            </div>
-            <div class="ml-3 text-right">
-              <p class="text-sm font-medium text-navy-800">{{ formatCurrency(d.total_amount || d.sum_amount || 0) }}</p>
-            </div>
+          <div class="mt-3 pt-3 border-t border-navy-200 flex justify-between">
+            <span class="font-medium text-navy-600">รวมทั้งสิ้น</span>
+            <span class="font-display font-bold text-navy-800">{{ formatCurrency(detail.header.sum_total_amount || detail.header.total_amount || 0) }}</span>
           </div>
-        </div>
-
-        <div class="mt-4 pt-3 border-t border-navy-200 flex justify-between">
-          <span class="font-medium text-navy-600">รวมทั้งสิ้น</span>
-          <span class="font-display font-bold text-navy-800">
-            {{ formatCurrency(detail.header.total_amount || detail.header.sum_total_amount || 0) }}
-          </span>
-        </div>
+        </template>
       </div>
     </ModalSheet>
   </div>
@@ -345,6 +350,22 @@ const recalcing = ref(false);
 const formatNumber = (n) => (n == null ? "0" : Number(n).toLocaleString("th-TH"));
 const formatDate = (d) => (d ? new Date(d).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" }) : "-");
 const formatCurrency = (n) => Number(n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2 });
+
+function groupedDetails(details) {
+  if (!details?.length) return [];
+  const groups = [];
+  let current = null;
+  for (const d of details) {
+    const key = d.description || null;
+    if (!current || current.description !== key) {
+      current = { description: key, items: [], total: 0 };
+      groups.push(current);
+    }
+    current.items.push(d);
+    current.total += Number(d.total_amount || d.sum_amount || 0);
+  }
+  return groups;
+}
 
 function paymentBadge(item) {
   if (item.status === 'pending') return { label: 'คงค้าง', cls: 'bg-red-50 text-red-600' };
