@@ -15,7 +15,10 @@
       <div v-for="item in items" :key="item.doc_no" @click="openDetail(item.doc_no)" class="card cursor-pointer hover:shadow-md hover:border-brand-200 transition-all">
         <div class="flex items-center justify-between">
           <div>
-            <p class="font-medium text-navy-700 text-sm">{{ item.doc_no }}</p>
+            <div class="flex items-center gap-2">
+              <p class="font-medium text-navy-700 text-sm">{{ item.doc_no }}</p>
+              <span class="text-xs px-2 py-0.5 rounded-full font-medium" :class="paymentBadge(item).cls">{{ paymentBadge(item).label }}</span>
+            </div>
             <p class="text-xs text-navy-400 mt-0.5">{{ formatDate(item.doc_date) }} {{ item.doc_time }}</p>
             <p class="text-navy-400 mt-0.5"><span class="text-xs">มูลค่า</span> {{ formatCurrency(item.total_amount) }}</p>
           </div>
@@ -87,6 +90,13 @@ const detail = ref(null);
 
 const formatDate = (d) => (d ? new Date(d).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" }) : "-");
 const formatCurrency = (n) => Number(n || 0).toLocaleString("th-TH", { minimumFractionDigits: 2 });
+
+function paymentBadge(item) {
+  if (item.status === 'pending') return { label: 'คงค้าง', cls: 'bg-red-50 text-red-600' };
+  if (item.status === 'success' && Number(item.balance) > 0) return { label: 'ชำระบางส่วน', cls: 'bg-orange-50 text-orange-600' };
+  if (item.status === 'success') return { label: 'ชำระแล้ว', cls: 'bg-emerald-50 text-emerald-600' };
+  return { label: '-', cls: 'bg-navy-50 text-navy-400' };
+}
 
 async function fetchData() {
   loading.value = true;
