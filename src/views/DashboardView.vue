@@ -36,6 +36,105 @@
         </div>
       </div>
 
+      <!-- Credit Detail Summary -->
+      <div v-if="creditDetail" class="grid grid-cols-2 gap-3">
+        <div class="card">
+          <p class="text-navy-400 text-xs font-medium">วงเงินเครดิต</p>
+          <p class="font-display text-lg font-bold text-navy-800 mt-1">{{ creditDetail.data_head.credit_money }}</p>
+        </div>
+        <div class="card">
+          <p class="text-navy-400 text-xs font-medium">สั่งจอง/สั่งซื้อ</p>
+          <p class="font-display text-lg font-bold text-blue-600 mt-1">{{ creditDetail.data_head.sum_ss }}</p>
+        </div>
+        <div class="card">
+          <p class="text-navy-400 text-xs font-medium">เช็คคงค้าง</p>
+          <p class="font-display text-lg font-bold text-amber-600 mt-1">{{ creditDetail.data_head.sum_cheque }}</p>
+        </div>
+        <div class="card">
+          <p class="text-navy-400 text-xs font-medium">หนี้คงค้าง</p>
+          <p class="font-display text-lg font-bold text-red-600 mt-1">{{ creditDetail.data_head.sum_status }}</p>
+        </div>
+      </div>
+
+      <!-- Credit Detail Tabs -->
+      <div v-if="creditDetail" class="space-y-3">
+        <div class="flex gap-1 bg-white rounded-xl p-1 border border-navy-100">
+          <button v-for="ct in creditTabs" :key="ct.key" @click="activeCreditTab = ct.key"
+            class="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
+            :class="activeCreditTab === ct.key ? 'bg-brand-500 text-white shadow-sm' : 'text-navy-500 hover:bg-navy-50'">
+            {{ ct.label }}
+          </button>
+        </div>
+
+        <!-- data_1: รายการเอกสาร -->
+        <div v-if="activeCreditTab === 'docs'" class="space-y-2">
+          <div class="card py-3 bg-navy-50 flex justify-between items-center">
+            <span class="text-sm font-medium text-navy-600">ยอดรวมหนี้คงค้าง</span>
+            <span class="font-display text-lg font-bold text-red-600">{{ creditDetail.data_head.sum_status }}</span>
+          </div>
+          <div v-if="creditDetail.data_1.length === 0" class="card text-center py-6 text-navy-400 text-sm">ไม่พบข้อมูล</div>
+          <div v-for="(item, i) in creditDetail.data_1" :key="i" class="card py-3">
+            <div class="flex justify-between items-start">
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-navy-700">{{ item.doc_no }}</p>
+                <p class="text-xs text-navy-400 mt-0.5">{{ formatDate(item.doc_date) }} · ครบกำหนด {{ formatDate(item.due_date) }}</p>
+                <p v-if="item.remark" class="text-xs text-navy-400 mt-0.5">{{ item.remark }}</p>
+              </div>
+              <div class="text-right ml-3">
+                <p class="text-sm font-medium" :class="Number(item.amount) < 0 ? 'text-emerald-600' : 'text-navy-800'">{{ formatCurrency(item.amount) }}</p>
+                <p class="text-xs text-navy-400">คงค้าง {{ formatCurrency(item.ar_balance) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- data_2: รายการเช็ค -->
+        <div v-if="activeCreditTab === 'cheques'" class="space-y-2">
+          <div class="card py-3 bg-navy-50 flex justify-between items-center">
+            <span class="text-sm font-medium text-navy-600">ยอดรวมเช็คคงค้าง</span>
+            <span class="font-display text-lg font-bold text-amber-600">{{ creditDetail.data_head.sum_cheque }}</span>
+          </div>
+          <div v-if="creditDetail.data_2.length === 0" class="card text-center py-6 text-navy-400 text-sm">ไม่พบข้อมูล</div>
+          <div v-for="(item, i) in creditDetail.data_2" :key="i" class="card py-3">
+            <div class="flex justify-between items-start">
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-navy-700">{{ item.chq_number }}</p>
+                <p class="text-xs text-navy-400 mt-0.5">รับเช็ค {{ formatDate(item.chq_get_date) }} · ครบกำหนด {{ formatDate(item.chq_due_date) }}</p>
+                <p v-if="item.doc_ref" class="text-xs text-navy-400 mt-0.5">อ้างอิง: {{ item.doc_ref }}</p>
+              </div>
+              <div class="text-right ml-3">
+                <p class="text-sm font-medium text-navy-800">{{ formatCurrency(item.amount) }}</p>
+                <span class="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">{{ item.status }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- data_3: SR/SS -->
+        <div v-if="activeCreditTab === 'srss'" class="space-y-2">
+          <div class="card py-3 bg-navy-50 flex justify-between items-center">
+            <span class="text-sm font-medium text-navy-600">ยอดรวมสั่งขาย</span>
+            <span class="font-display text-lg font-bold text-blue-600">{{ creditDetail.data_head.sumsrss }}</span>
+          </div>
+          <div v-if="creditDetail.data_3.length === 0" class="card text-center py-6 text-navy-400 text-sm">ไม่พบข้อมูล</div>
+          <div v-for="(item, i) in creditDetail.data_3" :key="i" class="card py-3">
+            <div class="flex justify-between items-start">
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-navy-700">{{ item.doc_no }}</p>
+                <p class="text-xs text-navy-400 mt-0.5">{{ formatDate(item.doc_date) }}</p>
+                <p v-if="item.remark" class="text-xs text-navy-400 mt-0.5">{{ item.remark }}</p>
+              </div>
+              <div class="text-right ml-3">
+                <p class="text-sm font-medium text-navy-800">{{ formatCurrency(item.total_amount) }}</p>
+                <span class="inline-block mt-1 text-xs px-2 py-0.5 rounded-full" :class="String(item.trans_flag) === '36' ? 'bg-blue-50 text-blue-700' : 'bg-navy-50 text-navy-600'">
+                  {{ String(item.trans_flag) === '34' ? 'SR' : 'SO' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Quick links -->
       <div class="grid grid-cols-3 gap-3">
         <router-link to="/sales" class="card text-center hover:shadow-md transition-shadow group">
@@ -76,7 +175,8 @@
         <div v-else class="space-y-3">
           <div v-for="item in recentPoints" :key="item.doc_no" class="flex items-center justify-between py-2 border-b border-navy-50 last:border-0">
             <div>
-              <p class="text-sm font-medium text-navy-700">{{ item.remark || item.doc_no }}</p>
+              <p class="text-sm font-medium text-navy-700">{{  item.remark || item.doc_no }}</p>
+                 <p class="  text-navy-400">{{  item.doc_no_sale || item.doc_no  }}</p>
               <p class="  text-navy-400">{{ formatDate(item.doc_date) }}</p>
             </div>
             <div class="text-right">
@@ -172,6 +272,13 @@ const customer = ref(null);
 const recentPoints = ref([]);
 const processing = ref(false);
 const processResult = ref(null);
+const creditDetail = ref(null);
+const activeCreditTab = ref('docs');
+const creditTabs = [
+  { key: 'docs', label: 'รายการคงค้าง' },
+  { key: 'cheques', label: 'รายการเช็ค' },
+  { key: 'srss', label: 'SR/SS' },
+];
 
 const formatNumber = (n) => {
   if (n == null) return '0';
@@ -182,6 +289,8 @@ const formatDate = (d) => {
   if (!d) return '-';
   return new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
 };
+
+const formatCurrency = (n) => Number(n || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 });
 
 const levelInfo = computed(() => {
   const points = Number(customer.value?.reward_point || 0);
@@ -218,6 +327,11 @@ onMounted(async () => {
     try {
       const { data } = await pointApi.movement({ limit: 5 });
       recentPoints.value = data.data;
+    } catch {}
+
+    try {
+      const { data } = await customerApi.getCreditDetail(customer.value?.code);
+      if (data.success) creditDetail.value = data;
     } catch {}
   }
 });

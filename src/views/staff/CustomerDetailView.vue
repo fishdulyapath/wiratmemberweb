@@ -35,6 +35,26 @@
       </div>
     </div>
 
+    <!-- Credit Detail Summary -->
+    <div v-if="creditDetail" class="grid grid-cols-2 gap-3">
+      <div class="card">
+        <p class="text-navy-400 text-xs font-medium">วงเงินเครดิต</p>
+        <p class="font-display text-lg font-bold text-navy-800 mt-1">{{ creditDetail.data_head.credit_money }}</p>
+      </div>
+      <div class="card">
+        <p class="text-navy-400 text-xs font-medium">สั่งขาย</p>
+        <p class="font-display text-lg font-bold text-blue-600 mt-1">{{ creditDetail.data_head.sum_sr }}</p>
+      </div>
+      <div class="card">
+        <p class="text-navy-400 text-xs font-medium">เช็คคงค้าง</p>
+        <p class="font-display text-lg font-bold text-amber-600 mt-1">{{ creditDetail.data_head.sum_cheque }}</p>
+      </div>
+      <div class="card">
+        <p class="text-navy-400 text-xs font-medium">หนี้คงค้าง</p>
+        <p class="font-display text-lg font-bold text-red-600 mt-1">{{ creditDetail.data_head.sum_status }}</p>
+      </div>
+    </div>
+
     <!-- Tabs -->
     <div class="flex gap-1 bg-white rounded-xl p-1 border border-navy-100">
       <button
@@ -138,6 +158,74 @@
       />
     </div>
 
+    <!-- Credit: รายการเอกสาร -->
+    <div v-if="activeTab === 'credit_docs'" class="space-y-2">
+      <div v-if="creditDetail" class="card py-3 bg-navy-50 flex justify-between items-center">
+        <span class="text-sm font-medium text-navy-600">ยอดรวมหนี้คงค้าง</span>
+        <span class="font-display text-lg font-bold text-red-600">{{ creditDetail.data_head.sum_status }}</span>
+      </div>
+      <div v-if="!creditDetail || creditDetail.data_1.length === 0" class="card text-center py-8 text-navy-400 text-sm">ไม่พบข้อมูล</div>
+      <div v-else v-for="(item, i) in creditDetail.data_1" :key="i" class="card py-3">
+        <div class="flex justify-between items-start">
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-navy-700">{{ item.doc_no }}</p>
+            <p class="text-xs text-navy-400 mt-0.5">{{ formatDate(item.doc_date) }} · ครบกำหนด {{ formatDate(item.due_date) }}</p>
+            <p v-if="item.remark" class="text-xs text-navy-400 mt-0.5">{{ item.remark }}</p>
+          </div>
+          <div class="text-right ml-3">
+            <p class="text-sm font-medium" :class="Number(item.amount) < 0 ? 'text-emerald-600' : 'text-navy-800'">{{ formatCurrency(item.amount) }}</p>
+            <p class="text-xs text-navy-400">คงค้าง {{ formatCurrency(item.ar_balance) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Credit: รายการเช็ค -->
+    <div v-if="activeTab === 'credit_cheques'" class="space-y-2">
+      <div v-if="creditDetail" class="card py-3 bg-navy-50 flex justify-between items-center">
+        <span class="text-sm font-medium text-navy-600">ยอดรวมเช็คคงค้าง</span>
+        <span class="font-display text-lg font-bold text-amber-600">{{ creditDetail.data_head.sum_cheque }}</span>
+      </div>
+      <div v-if="!creditDetail || creditDetail.data_2.length === 0" class="card text-center py-8 text-navy-400 text-sm">ไม่พบข้อมูล</div>
+      <div v-else v-for="(item, i) in creditDetail.data_2" :key="i" class="card py-3">
+        <div class="flex justify-between items-start">
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-navy-700">{{ item.chq_number }}</p>
+            <p class="text-xs text-navy-400 mt-0.5">รับเช็ค {{ formatDate(item.chq_get_date) }} · ครบกำหนด {{ formatDate(item.chq_due_date) }}</p>
+            <p v-if="item.doc_ref" class="text-xs text-navy-400 mt-0.5">อ้างอิง: {{ item.doc_ref }}</p>
+          </div>
+          <div class="text-right ml-3">
+            <p class="text-sm font-medium text-navy-800">{{ formatCurrency(item.amount) }}</p>
+            <span class="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">{{ item.status }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Credit: SR/SS -->
+    <div v-if="activeTab === 'credit_srss'" class="space-y-2">
+      <div v-if="creditDetail" class="card py-3 bg-navy-50 flex justify-between items-center">
+        <span class="text-sm font-medium text-navy-600">ยอดรวมสั่งขาย</span>
+        <span class="font-display text-lg font-bold text-blue-600">{{ creditDetail.data_head.sum_sr }}</span>
+      </div>
+      <div v-if="!creditDetail || creditDetail.data_3.length === 0" class="card text-center py-8 text-navy-400 text-sm">ไม่พบข้อมูล</div>
+      <div v-else v-for="(item, i) in creditDetail.data_3" :key="i" class="card py-3">
+        <div class="flex justify-between items-start">
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-navy-700">{{ item.doc_no }}</p>
+            <p class="text-xs text-navy-400 mt-0.5">{{ formatDate(item.doc_date) }}</p>
+            <p v-if="item.remark" class="text-xs text-navy-400 mt-0.5">{{ item.remark }}</p>
+          </div>
+          <div class="text-right ml-3">
+            <p class="text-sm font-medium text-navy-800">{{ formatCurrency(item.total_amount) }}</p>
+            <span class="inline-block mt-1 text-xs px-2 py-0.5 rounded-full" :class="String(item.trans_flag) === '36' ? 'bg-blue-50 text-blue-700' : 'bg-navy-50 text-navy-600'">
+              {{ String(item.trans_flag) === '34' ? 'SR' : 'SS' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Detail modal -->
     <ModalSheet :show="!!selectedDoc" :title="selectedDoc" :subtitle="modalSubtitle" :loading="detailLoading" @close="selectedDoc = null">
       <div v-if="detail">
@@ -204,7 +292,11 @@ const tabs = [
   { key: "points", label: "แต้มสะสม" },
   { key: "sales", label: "ประวัติซื้อ" },
   { key: "returns", label: "ประวัติคืน" },
+  { key: "credit_docs", label: "รายการคงค้าง" },
+  { key: "credit_cheques", label: "เช็ค" },
+  { key: "credit_srss", label: "SR/SS" },
 ];
+const creditDetail = ref(null);
 
 const sales = ref([]);
 const salesPage = ref(1);
@@ -282,6 +374,13 @@ async function fetchPoints() {
   } catch {}
 }
 
+async function fetchCreditDetail() {
+  try {
+    const { data } = await customerApi.getCreditDetail(custCode);
+    if (data.success) creditDetail.value = data;
+  } catch {}
+}
+
 async function recalc() {
   recalcing.value = true;
   try {
@@ -333,5 +432,6 @@ onMounted(() => {
   fetchSales();
   fetchReturns();
   fetchPoints();
+  fetchCreditDetail();
 });
 </script>

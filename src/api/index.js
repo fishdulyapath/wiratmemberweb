@@ -40,6 +40,7 @@ export const customerApi = {
   me: () => api.get('/customers/me'),
   search: (q) => api.get('/customers/search', { params: { q } }),
   get: (code) => api.get(`/customers/${code}`),
+  getCreditDetail: (custCode) => api.get('/customers/getCustomerCreditDetail', { params: { cust_code: custCode } }),
 };
 
 // Transactions
