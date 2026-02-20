@@ -48,7 +48,7 @@
           <div v-for="(d, i) in detail.details" :key="i" class="flex items-start justify-between py-2 border-b border-navy-50 last:border-0">
             <div class="flex-1 min-w-0">
               <p class="text-sm text-navy-700 truncate">{{ d.item_name }}</p>
-              <p class="text-xs text-navy-400">{{ d.item_code }} · {{ d.qty }} {{ d.unit_code }}</p>
+              <p class="text-xs text-navy-400">{{ d.item_code }} · {{ Number(d.qty).toFixed(2) }} {{ d.unit_code }}</p>
             </div>
             <p class="text-sm font-medium text-red-600 ml-3 whitespace-nowrap">-{{ formatCurrency(d.sum_amount) }}</p>
           </div>
